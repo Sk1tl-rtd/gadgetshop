@@ -1,0 +1,40 @@
+package com.ua.gadgetshop;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class GadgetControllerTest {
+
+    @Autowired
+    MockMvc mvc;
+
+    @Test
+    void listReturnsFiveGadgets() throws Exception {
+        mvc.perform(get("/api/gadgets"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(5))
+                .andExpect(jsonPath("$[0].name").value("iPhone 15"));
+    }
+
+    @Test
+    void getOneReturnsDetail() throws Exception {
+        mvc.perform(get("/api/gadgets/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.brand").value("Apple"))
+                .andExpect(jsonPath("$.specs.length()").value(3));
+    }
+
+    @Test
+    void unknownIdReturns404() throws Exception {
+        mvc.perform(get("/api/gadgets/999")).andExpect(status().isNotFound());
+    }
+}
